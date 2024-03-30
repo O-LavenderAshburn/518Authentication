@@ -1,24 +1,27 @@
 import sqlite3
 import os
 import platform
+import time
 #options
 OSType = ""
     
+def SQL_create_account():
+    x=1
 
 def checkOS():
      OSType = platform.system()
     
 
 
-def setUserName():
+def set_username():
     x=1
 
-def setPassword():
+def set_password():
     x=1
 
 
 def signup():
-    setUserName()
+    set_username()
 
 
 while(1):
@@ -37,14 +40,33 @@ while(1):
     print(opt1)
     print(opt2)
     print(opt3)
-
-    selected = input()
+    try:
+            selected = input()
+            option = int (selected)
     #select user naem
-    if selected == "1":
-        setUserName()
-    elif selected == "2":
-        setUserName()
-        setPassword()
+            if option == 1:
+                set_username()
+            elif option == 2:
+                set_username()
+                set_password()
+            elif option == 3:
+                exit(0)
+            else:
+                raise ValueError
+                
+    except ValueError: 
+        print("Error " + selected + " is not a valid input")
+        print("press 'ENTER' to continue"   )
+
+        input()
+
+
+
+
+
+
+        
+    
 
 
 
