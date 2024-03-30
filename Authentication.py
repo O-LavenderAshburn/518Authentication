@@ -1,39 +1,61 @@
+import sys
+sys.path.append("/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages")
 import sqlite3
 import os
 import platform
-import time
+import better_profanity
+from better_profanity import profanity
+
 #options
 OSType = ""
-    
-def SQL_create_account():
-    x=1
+
 
 def checkOS():
      OSType = platform.system()
     
 
+def clear_terminal():
+    if OSType == "Windows":
+        os.system('cls')
+    else:
+        os.system('clear')
+
+    
+def SQL_create_account():
+    clear_terminal()    
 
 def set_username():
-    x=1
+    clear_terminal()
+
+    
+    print("Please select a username: ")
+    username = input()
+    containsProfanity = profanity.contains_profanity(username)
+    if containsProfanity == True:
+        print("Usernames must not cointain offensive language\n enter 1 to retry")
+        opt = input()
+        if opt != "1":
+            return
+        else:
+            clear_terminal()
+    else:
+        return
+
+
 
 def set_password():
     x=1
 
 
-def signup():
-    set_username()
 
 
 while(1):
     checkOS()
-    if OSType == "Windows":
-        os.system('cls')
-    else:
-        os.system('clear')
+    clear_terminal()
     
     opt1 = "1. Sign up"
-    opt2 = "2. sign in"
-    opt3 = "3. exit"
+    opt2 = "2. Sign In"
+    opt3 = "3. Exit"
 
 #print option
     print("Welcome please select an option")
@@ -45,7 +67,7 @@ while(1):
             option = int (selected)
     #select user naem
             if option == 1:
-                set_username()
+                signup()
             elif option == 2:
                 set_username()
                 set_password()
