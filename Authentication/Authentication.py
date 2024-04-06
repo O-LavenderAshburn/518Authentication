@@ -56,7 +56,7 @@ def SQL_get_user_infromation(username):
         return userInfo
     
     else:
-        usserInfo = None
+        userInfo = None
         return userInfo
 
 
@@ -81,22 +81,37 @@ def clear_terminal():
 
 #creates the tables for sql
 def SQL_create_account(username, Salt, hashedSalt):
-    #connect to database 
-    con = sqlite3.connect("authentication.db")
-    cursor = con.cursor()
-    cursor.execute('''
-        INSERT INTO users (username, salt,passwordhash) VALUES (?,?,?)
-                   ''',(username,Salt,hashedSalt))
-    con.commit()
-    #enter data into database
-    clear_terminal()    
+    try:
+        #connect to database 
+        conn = sqlite3.connect("authentication.db")
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO users (username, salt,passwordhash) VALUES (?,?,?)
+                    ''',(username,Salt,hashedSalt))
+        conn.commit()
+        # Close the connection
+        conn.close()
+        #enter data into database
+        clear_terminal()
+    except sqlite3.Error as e:    
+        # Handle the error
+        print("SQLite error:", e)
+        print("press 'enter' to return")
+
+         # Rollback the transaction
+        conn.rollback()
+        input()
+    
+    finally:
+        # Close the connection
+        conn.close()
 
 
 #hash password using bcrypt
 def create_acc(username, password):
 
-   # print("salted pwoed " + salted_password+"\n")
-   #print("hash " + hashed +"\n")
+    #print("salted pwoed " + salted_password+"\n")
+    #print("hash " + hashed +"\n")
     salt = bcrypt.gensalt(16)
 
     hashed = bcrypt.hashpw(password.encode('utf-8'),salt)
@@ -132,8 +147,9 @@ def set_username():
                     #quit
                     return 0
             #check for any profanity in the username
+            explicitProfanity = profanity.contains_profanity(explicitProfanity)
             containsProfanity = better_better_profanity(username,wordlist)
-            if containsProfanity == True:
+            if containsProfanity or explicitProfanity == True:
                 print("Error! Usernames must not cointain offensive language\n enter 1 to retry")
                 x = input()
                 if x == "1":
@@ -158,17 +174,16 @@ def set_password():
             if len(password) < 8:
                 print("Error! Password is too short.\nThe password must be at least 8 characters long and not contain sequential or repeating characters \n enter 1 to retry")
                 opt = input()
-                if opt != "1":
+                if opt == "1":
                     break
                 else:
                     return 0
             
-            isValid = password_filter.check_sequential(password)
             isWeak = password_filter.check_compromised_password(password,"weakpasswords.txt")
             if isWeak == True:
                 print("Error! Password is too weak\n.The password must be at least 8 characters long and not contain sequential or repeating characters \n enter 1 to retry")
                 opt = input()
-                if opt != "1":
+                if opt == "1":
                     break
                 else:
                     return 0
@@ -177,25 +192,18 @@ def set_password():
             if isCompromised == True:
                 print("Error! Error! Password is too weak\n.The password must be at least 8 characters long and not contain sequential or repeating characters \n enter 1 to retry")
                 opt = input()
-                if opt != "1":
+                if opt == "1":
                     break
                 else:
                     return 0
-
-            if isValid == True:
-                return password
-            else:
-                print("Error! Password must not Repeating or Sequential characters. \n enter 1 to retry")
-                opt = input()
-                if opt != "1":
-                    break
-                else:
-                    return 0
+            return password
+                
 
 
-def validate_password(password,salt,hashed_salt):
+def validate_password(password,hashed_salt):
     # Verify the entered password against the retrieved hashed password
-    if bcrypt.checkpw(password.encode('utf-8'), hashed_salt):
+    pword = bytes(password,'utf-8')
+    if bcrypt.checkpw(pword, hashed_salt):
         return 1
     else:
         return 0
@@ -204,6 +212,7 @@ def validate_password(password,salt,hashed_salt):
 def approve_sign_in():
     clear_terminal()
     print("Sign in successful")
+    input()
 
 
 def validate_user(input_username,password):
@@ -212,10 +221,11 @@ def validate_user(input_username,password):
 
     if user_information == None:
         print("Error: invalid Username or Password")
+        input()
     else:
       #if user information exists
        username,salt,hashed_salt =user_information
-       isValid = validate_password(salt,hashed_salt,password)
+       isValid = validate_password(password,hashed_salt)
        if isValid == 1:
            approve_sign_in()
 
@@ -258,12 +268,13 @@ while(1):
         elif option == 2:
             signin()    
         elif option == 3:
+            clear_terminal()
             exit(0)
         else:
             raise ValueError
                 
     except ValueError: 
         print("Error " + selected + " is not a valid input")
-        print("press 'ENTER' to continue" )
+        print("press 'ENTER' to continue")
         input()
         
