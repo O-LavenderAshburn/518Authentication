@@ -2,6 +2,7 @@
 
 #activate Virtual envirment
 cd Authentication
+python -m venv auth-env
 source auth-env/bin/activate
 
 #install dependantcies
