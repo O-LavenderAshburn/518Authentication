@@ -147,7 +147,7 @@ def set_username():
                     #quit
                     return 0
             #check for any profanity in the username
-            explicitProfanity = profanity.contains_profanity(explicitProfanity)
+            explicitProfanity = profanity.contains_profanity(username3)
             containsProfanity = better_better_profanity(username,wordlist)
             if containsProfanity or explicitProfanity == True:
                 print("Error! Usernames must not cointain offensive language\n enter 1 to retry")
@@ -237,7 +237,6 @@ def validate_user(input_username,password):
 def signin():
     print("Enter username: ")
     username = input()
-    print("Enter password: ")
     password = maskpass.askpass(mask=("*"))
 
     validate_user(username,password)
