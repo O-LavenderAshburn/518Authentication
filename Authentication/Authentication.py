@@ -18,7 +18,7 @@ sys.path.append("/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.
 
 
 def read_profanity(file_path):
-    """ Reads in profanity words """
+    """Reads in profanity words """
 
     word_list = []
 
@@ -117,6 +117,7 @@ def create_account_sql(username, salt, hashed_salt):
     @param salt salt to use on the password 
     @param hashed_salt bCrypt hashed salt 
     """
+    
     try:
         #connect to database 
         conn = sqlite3.connect("authentication.db")
@@ -127,7 +128,8 @@ def create_account_sql(username, salt, hashed_salt):
             INSERT INTO users (username, 
                        salt,passwordhash) 
                        VALUES (?,?,?)
-                    ''',(username,salt,hashed_salt))
+                    ''',(username,salt
+                         ,hashed_salt))
         
         conn.commit()
         # Close the connection
@@ -167,6 +169,7 @@ def create_acc(username, password):
 
 def signup():
     """signup protocol"""
+    
     username = set_username()
     if username != 0:
        password = set_password()
