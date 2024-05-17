@@ -19,9 +19,8 @@ sys.path.append("/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.
 
 
 def read_profanity(file_path):
-    """
-    Reads in profanity words
-    """
+    """ Reads in profanity words """
+
     word_list = []
 
     # Open the text file in read mode
@@ -61,15 +60,20 @@ def better_better_profanity(username, profanity_list):
 
 def SQL_get_user_infromation(username):
     """
-    gets user information from SqlLite
+    gets user information from SQLite
 
     @param username Username of the user
 
     """
+
+    #connect to sqlite
     con = sqlite3.connect("authentication.db")
     cursor = con.cursor()
-
+    
+    #execute query
     cursor.execute(''' SELECT username, salt,passwordhash FROM users WHERE username = ? ''',(username,))
+
+    #store user information
     global user
     user = cursor.fetchone()
     if user:
@@ -81,36 +85,52 @@ def SQL_get_user_infromation(username):
         return userInfo
 
 
-#check username conforms to the charaters 
-def check_username(input_string):
+def check_username_characters(username):
+    """
+    Checks that characters in username are valid characters A-Z, a-z, 0-9
+
+    @param username Username to check
+    """
     pattern = re.compile(r'^[a-zA-Z0-9_]+$')
-    return bool(pattern.match(input_string))
+    return bool(pattern.match(username))
 
 
-#get operating system type for clearing the terminal
 def checkOS():
+     """Get operating system type for clearing the terminal"""
+
      global OSType
      OSType = platform.system()
     
 
 def clear_terminal():
-    """
-    clears the terminal based on the os type 
-    """
+    """ clears the terminal based on the os type """
+
     if OSType == "Windows":
         os.system('cls')
     else:
         os.system('clear')
 
 
-def SQL_create_account(username, Salt, hashedSalt):
+def create_account_sql(username, salt, hashed_salt):
+    """
+    Creates account in database using SQLite
+
+    @param username Username of the account
+    @param salt salt to use on the password 
+    @param hashed_salt bCrypt hashed salt 
+    """
     try:
         #connect to database 
         conn = sqlite3.connect("authentication.db")
         cursor = conn.cursor()
+
+        #execute query
         cursor.execute('''
-            INSERT INTO users (username, salt,passwordhash) VALUES (?,?,?)
-                    ''',(username,Salt,hashedSalt))
+            INSERT INTO users (username, 
+                       salt,passwordhash) 
+                       VALUES (?,?,?)
+                    ''',(username,salt,hashed_salt))
+        
         conn.commit()
         # Close the connection
         conn.close()
@@ -132,13 +152,21 @@ def SQL_create_account(username, Salt, hashedSalt):
 
 #hash password using bcrypt
 def create_acc(username, password):
+    """
+    Hashes password and calls function to create the account in the database 
 
-    #print("salted pwoed " + salted_password+"\n")
-    #print("hash " + hashed +"\n")
+    @param username the username of the user
+    @param password the password to use and to be hashed
+    """
+    
+    #generate salt
     salt = bcrypt.gensalt(16)
 
+    #hash password with salt
     hashed = bcrypt.hashpw(password.encode('utf-8'),salt)
-    SQL_create_account(username,salt,hashed)
+
+    #create in database
+    create_account_sql(username,salt,hashed)
     
 
 #init signup process
@@ -159,7 +187,7 @@ def set_username():
         username = input()
         while(1):
             #check username uses corret set of characters    
-            charSetCheck = check_username(username)
+            charSetCheck = check_username_characters(username)
             if charSetCheck == False:
                 print("Error! Username must only use characters [a-zA-Z0-9_]\n enter 1 to retry")
                 opt = input()
