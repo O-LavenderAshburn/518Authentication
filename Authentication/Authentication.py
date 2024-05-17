@@ -18,7 +18,7 @@ sys.path.append("/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.
 
 
 def read_profanity(file_path):
-    """Reads in profanity words """
+    """Reads in profanity words"""
 
     word_list = []
 
@@ -59,7 +59,7 @@ def better_better_profanity(username, profanity_list):
 
 def SQL_get_user_infromation(username):
     """
-    gets user information from SQLite
+    Gets user information from SQLite
 
     @param username Username of the user
     """
@@ -101,7 +101,7 @@ def checkOS():
     
 
 def clear_terminal():
-    """ clears the terminal based on the os type """
+    """Clears the terminal based on the os type """
 
     if OSType == "Windows":
         os.system('cls')
@@ -168,8 +168,8 @@ def create_acc(username, password):
     
 
 def signup():
-    """signup protocol"""
-    
+    """Signup protocol"""
+
     username = set_username()
     if username != 0:
        password = set_password()
@@ -178,7 +178,7 @@ def signup():
 
 
 def set_username():
-    """set username protocol for a new user"""
+    """Set username protocol for a new user"""
 
     #read in wordlist
     wordlist = read_profanity('profanity_wordlist.txt')
@@ -222,7 +222,7 @@ def set_username():
         
      
 def set_password():
-    """run password setting protocol to set a new password for a new user"""
+    """Run password setting protocol to set a new password for a new user"""
 
     while(1):
 
@@ -320,7 +320,7 @@ def validate_user(input_username,password):
 
 
 def signin():
-    """ sign in protocol"""
+    """Sign in protocol"""
 
     #prompt user
     print("Enter username: ")
