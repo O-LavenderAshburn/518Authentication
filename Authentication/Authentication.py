@@ -1,5 +1,9 @@
+"""
+User Authentication Simulation 
+"""
+
+
 import sys
-sys.path.append("/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages")
 import sqlite3
 import secrets  
 import maskpass
@@ -10,12 +14,14 @@ import re
 import bcrypt
 import password_filter
 
-#options
-OSType = ""
-user = ""
+
+sys.path.append("/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages")
 
 
 def read_profanity(file_path):
+    """
+    Reads in profanity words
+    """
     word_list = []
 
     # Open the text file in read mode
@@ -24,14 +30,22 @@ def read_profanity(file_path):
         for line in file:
             # Strip whitespace and newline characters from the line and split it into words
             words = line.strip().split()
-
             # Add each word to the word_list
             word_list.extend(words)
 
     return word_list
 
-def better_better_profanity(username, profanity_list):
 
+def better_better_profanity(username, profanity_list):
+    """
+    Uses Regex to check for profanity words in username 
+    Play on words with the library better profanity
+
+    @param username Username to check
+    @param profanity_list List of profanity words
+
+    @returns True if profanity is found in the username, else false
+    """
     for profanity_word in profanity_list:
         # Define a regular expression pattern to match the profanity word surrounded by any characters
         pattern = fr'\b\w*{re.escape(profanity_word)}\w*\b'
@@ -44,12 +58,19 @@ def better_better_profanity(username, profanity_list):
             return True
     return False
 
+
 def SQL_get_user_infromation(username):
+    """
+    gets user information from SqlLite
+
+    @param username Username of the user
+
+    """
     con = sqlite3.connect("authentication.db")
     cursor = con.cursor()
-   
 
     cursor.execute(''' SELECT username, salt,passwordhash FROM users WHERE username = ? ''',(username,))
+    global user
     user = cursor.fetchone()
     if user:
         userInfo = user  # Returns a tuple (username, password, salt)
@@ -68,18 +89,20 @@ def check_username(input_string):
 
 #get operating system type for clearing the terminal
 def checkOS():
+     global OSType
      OSType = platform.system()
     
 
-#clear the terminal
 def clear_terminal():
+    """
+    clears the terminal based on the os type 
+    """
     if OSType == "Windows":
         os.system('cls')
     else:
         os.system('clear')
 
 
-#creates the tables for sql
 def SQL_create_account(username, Salt, hashedSalt):
     try:
         #connect to database 
