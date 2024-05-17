@@ -1,5 +1,13 @@
+"""
+Sets up SQLite database locally
+"""
+
 import sqlite3
+
+
 def setup_db():
+    """set up database"""
+    
     con = sqlite3.connect("authentication.db")
     cursor = con.cursor()
 
@@ -11,8 +19,9 @@ def setup_db():
         passwordhash TEXT NOT NULL
     );
     '''
-
+    #execute query
     cursor.execute(create_table_query)
+
     # Commit changes and close the connection
     con.commit()
     con.close()

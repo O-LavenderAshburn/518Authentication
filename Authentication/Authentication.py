@@ -11,7 +11,6 @@ import platform
 from better_profanity import profanity
 import re
 import bcrypt
-import password_filter
 
 
 sys.path.append("/Library/Frameworks/Python.framework/Versions/3.11/lib/python3.11/site-packages")
@@ -32,6 +31,23 @@ def read_profanity(file_path):
             word_list.extend(words)
 
     return word_list
+
+def check_password_file(password, filename):
+    """
+    Checks if password is contained in file 
+
+    @param password Password to check
+    @param filename Name of file with compromised passwords 
+
+    @return True if the password is part of the compromised password list else False
+    """
+    with open(filename, 'r') as file:
+        compromised_passwords = file.readlines()
+        compromised_passwords = [pwd.strip() for pwd in compromised_passwords]
+        if password in compromised_passwords:
+            return True
+        else:
+            return False
 
 
 def better_better_profanity(username, profanity_list):
@@ -242,7 +258,7 @@ def set_password():
                     return 0
             
             #check that password isn't too weak
-            isWeak = password_filter.check_compromised_password(password,"weakpasswords.txt")
+            isWeak = check_password_file(password,"weakpasswords.txt")
             if isWeak == True:
                 
                 #print error
@@ -253,7 +269,7 @@ def set_password():
                 else:
                     return 0
             #check if password is a compromised password
-            isCompromised = password_filter.check_compromised_password(password,"breachedpasswords.txt")
+            isCompromised = check_password_file(password,"breachedpasswords.txt")
             if isCompromised == True:
                 
                 #print error
