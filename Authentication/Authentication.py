@@ -2,7 +2,6 @@
 User Authentication Simulation 
 """
 
-
 import sys
 import sqlite3
 import secrets  
@@ -63,7 +62,6 @@ def SQL_get_user_infromation(username):
     gets user information from SQLite
 
     @param username Username of the user
-
     """
 
     #connect to sqlite
@@ -150,7 +148,6 @@ def create_account_sql(username, salt, hashed_salt):
         conn.close()
 
 
-#hash password using bcrypt
 def create_acc(username, password):
     """
     Hashes password and calls function to create the account in the database 
@@ -165,12 +162,11 @@ def create_acc(username, password):
     #hash password with salt
     hashed = bcrypt.hashpw(password.encode('utf-8'),salt)
 
-    #create in database
     create_account_sql(username,salt,hashed)
     
 
-#init signup process
 def signup():
+    """signup protocol"""
     username = set_username()
     if username != 0:
        password = set_password()
@@ -178,29 +174,37 @@ def signup():
            create_acc(username,password)
 
 
-#set a username for a new user
 def set_username():
+    """set username protocol for a new user"""
+
+    #read in wordlist
     wordlist = read_profanity('profanity_wordlist.txt')
     clear_terminal()
     while(1):
         print("Please select a username: ")
         username = input()
         while(1):
+
             #check username uses corret set of characters    
             charSetCheck = check_username_characters(username)
             if charSetCheck == False:
+
                 print("Error! Username must only use characters [a-zA-Z0-9_]\n enter 1 to retry")
                 opt = input()
+
                 if opt == "1":
                     #break out of current checks
                     break
                 else:
                     #quit
                     return 0
+                
             #check for any profanity in the username
             explicitProfanity = profanity.contains_profanity(username3)
             containsProfanity = better_better_profanity(username,wordlist)
+
             if containsProfanity or explicitProfanity == True:
+
                 print("Error! Usernames must not cointain offensive language\n enter 1 to retry")
                 x = input()
                 if x == "1":
@@ -213,16 +217,20 @@ def set_username():
             #finish
             return username
         
-
-#Set a new password for a new user        
+     
 def set_password():
-     #Set password
+    """run password setting protocol to set a new password for a new user"""
+
     while(1):
+
         #prompt user for password 
         print("Please enter a password")
         password = maskpass.askpass(mask="*")
+
         while(1):
+
             if len(password) < 8:
+
                 print("Error! Password is too short.\nThe password must be at least 8 characters long and not contain sequential or repeating characters \n enter 1 to retry")
                 opt = input()
                 if opt == "1":
@@ -230,17 +238,22 @@ def set_password():
                 else:
                     return 0
             
+            #check that password isn't too weak
             isWeak = password_filter.check_compromised_password(password,"weakpasswords.txt")
             if isWeak == True:
+                
+                #print error
                 print("Error! Password is too weak\n.The password must be at least 8 characters long and not contain sequential or repeating characters \n enter 1 to retry")
                 opt = input()
                 if opt == "1":
                     break
                 else:
                     return 0
-    
+            #check if password is a compromised password
             isCompromised = password_filter.check_compromised_password(password,"breachedpasswords.txt")
             if isCompromised == True:
+                
+                #print error
                 print("Error! Error! Password is too weak\n.The password must be at least 8 characters long and not contain sequential or repeating characters \n enter 1 to retry")
                 opt = input()
                 if opt == "1":
@@ -250,10 +263,19 @@ def set_password():
             return password
                 
 
-
 def validate_password(password,hashed_salt):
-    # Verify the entered password against the retrieved hashed password
+    """
+    Verify the entered password against the retrieved hashed password
+
+    @param password Password to valitdae 
+    @param hashed_salt Salt to use to check passowrd
+
+    @return 1 if password is valid else 0
+    """
+
     pword = bytes(password,'utf-8')
+
+    #check password is valid 
     if bcrypt.checkpw(pword, hashed_salt):
         return 1
     else:
@@ -261,12 +283,22 @@ def validate_password(password,hashed_salt):
     
 
 def approve_sign_in():
+    """Print if passwod is login is successful"""
+
+    #clear terminal 
     clear_terminal()
+    #print success
     print("Sign in successful")
     input()
 
 
 def validate_user(input_username,password):
+    """
+    Validate user protocol 
+
+    @param input_username Username user has input
+    @param password password the user has input
+    """
     #get user information
     user_information = SQL_get_user_infromation(input_username)
 
@@ -284,16 +316,20 @@ def validate_user(input_username,password):
             print("Error: invalid Username or Password")
 
 
-
 def signin():
+    """ sign in protocol"""
+
+    #prompt user
     print("Enter username: ")
     username = input()
+
+    #mask password
     password = maskpass.askpass(mask=("*"))
 
+    #call validate_user
     validate_user(username,password)
     
 
-#Main program
 while(1):
     checkOS()
     clear_terminal()
